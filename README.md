@@ -60,6 +60,7 @@ In this exercise, instead of pulling data from a third-party MQTT broker, you wi
 
 The Maven project in the *simple-flink-job* folder contains the basic elements of a Java program that defines the basic configuration of a Flink's Job, and creates the initial DataStream object (#1 in the second diagram). Add the code to create processing pipelines described in the exercise's introduction.
 
+0. Change the first parameter used on the the FlinkKafkaConsumer constructor (THE-KAFKA-TOPIC) with the Kafka topic name defined in Part I.
 1. Check Flink's [documentation on DataStream transformations](https://ci.apache.org/projects/flink/flink-docs-stable/dev/stream/operators/), especially the Map and Filter Operators.
 2. Apply a *map* transformation to the data stream created for the Kafka topic, so it receives a String (the JSON documents posted by the IoT devices)  and return a Java Object. To do so:
 	* Check how the [Jackson Object mapper works](https://www.baeldung.com/jackson-object-mapper-tutorial).
