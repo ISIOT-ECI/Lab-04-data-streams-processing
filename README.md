@@ -11,7 +11,7 @@ In this exercise, instead of pulling data from a third-party MQTT broker, you wi
 
 * The job deployed on the Job Manager, and executed by the available task managers, will create the 'input' DataStream from the KAFKA topic using the consumer provided by the Flink's API.
 * A MAP function will convert the data received on this first DataStream (which is  the plain-text JSON posted by the IoT devices), in a Java Object.
-* Two filters will be applied, in parallel, to the DataStream that result from the previous Map function. One will filter the data with temperature readings above 20, and the other with readings below this value. The output of the first filter, in turn, will pass through anoter mapping function, which will turn all messages Java Objects into an different kind of object (AlertMessage), before ending in its Sink. The output of the second filter will be connected directly to a Sink. For testing purposes, you will be using a 'Print Sink', that just print all the data from the DataStream in STDOUT. Once the configuration is working, you will replace these 'Print sinks' with sinks that send email messages and make the data persistent.
+* Two filters will be applied, in parallel, to the DataStream that results from the previous Map function. One will filter the data with temperature readings above 20, and the other with readings below this value. The output of the first filter, in turn, will pass through another mapping function, which will turn all messages Java Objects into a different kind of object (AlertMessage), before ending in its Sink. The output of the second filter will be connected directly to a Sink. For testing purposes, you will be using a 'Print Sink', that just print all the data from the DataStream in STDOUT. Once the configuration is working, you will replace these 'Print sinks' with sinks that send email messages and make the data persistent.
 
 ![](img/lab4.png)
 
@@ -36,7 +36,7 @@ In this exercise, instead of pulling data from a third-party MQTT broker, you wi
         - ./simple-flink-job:/jobs-jars	
 	```
 
-5. The environment variable *KAFKA\_MQTT\_TOPIC\_REGEX\_LIST* is not yet defined in the configuration of the *kafka-mqtt-proxy* service. It defines which MQTT topics -on the 'proxy' MQTT broker- will be mapped as a KAFKA topic. You can provide a list of mappings with the form *kafka-topic:mqtt-topic-regex*, where *mqtt-topic-regex* is a regular expresion:
+5. The environment variable *KAFKA\_MQTT\_TOPIC\_REGEX\_LIST* is not yet defined in the configuration of the *kafka-mqtt-proxy* service. It defines which MQTT topics -on the 'proxy' MQTT broker- will be mapped as a KAFKA topic. You can provide a list of mappings with the form *kafka-topic:mqtt-topic-regex*, where *mqtt-topic-regex* is a regular expression:
 
 	```yaml
 	KAFKA_MQTT_TOPIC_REGEX_LIST: 'kafka-topic1:mqtt-topc-regex1,kafka-topic2:mqtt-topc-regex2'
@@ -68,7 +68,7 @@ The Maven project in the *simple-flink-job* folder contains the basic elements o
 
 3. Follow the same documentation to create the two 'temperature filters', and apply them on the DataStream that resulted from the *map* transformation in Step 2.
 4. Set a [PrintSinkFunction]() as a sink to the DataStream that resulted from the 'low-temperature' filter.
-5. Create a 'map' transformation for the DataStream that resulted from the 'high-temperature' filter. This transformation sould turn the POJO defined by you, into an AlertMessage POJO (included in the project), with your email address as recipient, and, as a message, something like *"Alert: high temperature - XX degrees, reported by device YYY"*. Add a PrintSinkFunction, in turn, to the DataStream created by this map transformation.
+5. Create a 'map' transformation for the DataStream that resulted from the 'high-temperature' filter. This transformation should turn the POJO defined by you, into an AlertMessage POJO (included in the project), with your email address as the recipient, and, as a message, something like *"Alert: high temperature - XX degrees, reported by device YYY"*. Add a PrintSinkFunction, in turn, to the DataStream created by this map transformation.
 
 6. Build and package your project. Make note of the name of the JAR file created on the *target* folder that ends on '-with-dependencies.jar'. 
 
@@ -84,13 +84,13 @@ The Maven project in the *simple-flink-job* folder contains the basic elements o
 	```
 	Alternatively, you can use Flink's web UI, which should be accesible from the host at http://localhost:8081, to upload the JAR file.
 
-8. Post some data to the MQTT-proxy as you did in the part I of the exercise (with values above and below 20). If everythink is working correctly, you should see in the terminal where you started docker-compose, or in [the logs of the *taskmanager*](https://docs.docker.com/engine/reference/commandline/logs/) the messages of the two *PrintSinkFunction* sinks.
+8. Post some data to the MQTT-proxy as you did in the part I of the exercise (with values above and below 20). If everything is working correctly, you should see in the terminal where you started docker-compose, or in [the logs of the *taskmanager*](https://docs.docker.com/engine/reference/commandline/logs/) the messages of the two *PrintSinkFunction* sinks.
 
 # Part III.
 
 Update your system configuration so instead of just printing the data from the two ending DataStreams, you make something useful with it. 
 
-1. Create a new type of Sink, which sends an email when receiving an AlertMessage object. You can do so by creating a class that extends the [RichSinkFunction class](https://ci.apache.org/projects/flink/flink-docs-release-1.9/api/java/org/apache/flink/streaming/api/functions/sink/RichSinkFunction.html) and overrided the *invoke* method. Add this custom sink ad the end of the DataStream with the AlertMessage objects (#3 in the diagram).
+1. Create a new type of Sink, which sends an email when receiving an AlertMessage object. You can do so by creating a class that extends the [RichSinkFunction class](https://ci.apache.org/projects/flink/flink-docs-release-1.9/api/java/org/apache/flink/streaming/api/functions/sink/RichSinkFunction.html) and overriding the *invoke* method. Add this custom sink ad the end of the DataStream with the AlertMessage objects (#3 in the diagram).
 
 2. Make the output of the DataStream #2 (see diagram) persistent in a Cassandra database. To do so, add a [cassandra service to your Docker-compose configuration](https://hub.docker.com/r/bitnami/cassandra/), and check how the [*CassandraSink*](https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/cassandra.html) works. 
 
