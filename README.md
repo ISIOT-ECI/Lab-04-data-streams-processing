@@ -1,6 +1,6 @@
 ### Software Engineering for IoT and BigData
+### Lab 4 - Data streams processing
 
-### Lab 4 
 
 In Lab-03, as depicted in the following diagram, you set up a basic data ingestion configuration (using Docker containers and Docker-compose), where the messages posted by the IoT devices to a cloud-based MQTT Broker, were pulled by Kafka-connect, and then forwarded to a Kafka topic. As a proof of concept, a basic Java-based kafka consumer was created.
 
